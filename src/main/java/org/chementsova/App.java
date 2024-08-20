@@ -20,34 +20,34 @@ public class App
         List<Person> people = personDAO.getPeople();
         printPeople(people);
 
-        personDAO.savePerson(new Person("Sasha","2024-08-08"));
-
-        ticketDAO.saveTicket(new Ticket(TicketType.BUS,"2024-08-11",1));
-
-        ticketDAO.updateTicketType(1, TicketType.BUS);
-
-        tickets = ticketDAO.getTickets();
-        printTickets(tickets);
-
-        personDAO.deletePerson(1);
-
-        tickets = ticketDAO.getTickets();
-        printTickets(tickets);
-
-        people = personDAO.getPeople();
-        printPeople(people);
-
-        people = personDAO.getPersonByID(2);
-        printPeople(people);
-
-        tickets = ticketDAO.getTicketsByUserID(2);
-        printTickets(tickets);
-
-        tickets = ticketDAO.getTicketByID(3);
-        printTickets(tickets);
-
+//        personDAO.savePerson(new Person("Masha","2024-08-12"));
+//
+//        ticketDAO.saveTicket(new Ticket(TicketType.BUS,"2024-08-11",1));
+//
+//        ticketDAO.updateTicketType(1, TicketType.BUS);
+//
+//        tickets = ticketDAO.getTickets();
+//        printTickets(tickets);
+//
+//        personDAO.deletePerson(1);
+//
+//        tickets = ticketDAO.getTickets();
+//        printTickets(tickets);
+//
+//        people = personDAO.getPeople();
+//        printPeople(people);
+//
+//        people = personDAO.getPersonByID(2);
+//        printPeople(people);
+//
+//        tickets = ticketDAO.getTicketsByUserID(2);
+//        printTickets(tickets);
+//
+//        tickets = ticketDAO.getTicketByID(3);
+//        printTickets(tickets);
+//
+//    }
     }
-
     private static void printTickets(List<Ticket> tickets){
         if (tickets.isEmpty()) {
             System.out.println("Tickets are empty");

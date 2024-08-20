@@ -15,7 +15,7 @@ public class TicketDAOImpl implements TicketDAO {
         String query = "INSERT INTO Ticket (ticket_type, creation_date, user_id) VALUES (?, ?, ?)";
         try (Connection connection = DbUtils.connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, ticket.getTicketType().toString());
+            statement.setObject(1, ticket.getTicketType(), java.sql.Types.OTHER);
             statement.setDate(2, (Date) ticket.getCreationDate());
             statement.setInt(3, ticket.getPersonId());
             statement.executeUpdate();
@@ -91,7 +91,7 @@ public class TicketDAOImpl implements TicketDAO {
         String query = "UPDATE Ticket SET ticket_type = ? WHERE id = ?";
         try (Connection connection = DbUtils.connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, newTicketType.toString());
+            statement.setObject(1, newTicketType, java.sql.Types.OTHER);
             statement.setInt(2, id);
             statement.executeUpdate();
         } catch (SQLException e) {
