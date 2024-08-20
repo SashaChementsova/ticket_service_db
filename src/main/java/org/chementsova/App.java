@@ -3,6 +3,8 @@ package org.chementsova;
 import org.chementsova.dao.*;
 import org.chementsova.dao.daoImpl.*;
 import org.chementsova.model.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.*;
 import java.util.List;
@@ -11,8 +13,12 @@ import java.util.List;
 public class App 
 {
     public static void main( String[] args ) throws SQLException {
-        TicketDAO ticketDAO = new TicketDAOImpl();
-        PersonDAO personDAO = new PersonDAOImpl();
+
+        ApplicationContext ctx = new AnnotationConfigApplicationContext(DataConfig.class);
+
+        TicketDAO ticketDAO = ctx.getBean(TicketDAOImpl.class);
+
+        PersonDAO personDAO = ctx.getBean(PersonDAOImpl.class);
 
         List<Ticket> tickets = ticketDAO.getTickets();
         printTickets(tickets);
