@@ -1,19 +1,35 @@
 package org.chementsova.dao.daoImpl;
 
-import org.chementsova.DbUtils;
 import org.chementsova.dao.PersonDAO;
 import org.chementsova.model.Person;
+import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class PersonDAOImpl implements PersonDAO {
+
+    private static final String QUERY_ADD_PERSON = "INSERT INTO Person (name, creation_date) VALUES (?, ?)";
+
+    private static final String QUERY_GET_PEOPLE = "SELECT * FROM Person";
+
+    private static final String QUERY_REMOVE_PERSON = "DELETE FROM Person WHERE id = ?";
+
+    private static final String QUERY_GET_PERSON_BY_ID = "SELECT * FROM Person WHERE id = ?";
+
+    private DataSource dataSource;
+    
+    public PersonDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
-    public void savePerson(Person person){
-        String query = "INSERT INTO Person (name, creation_date) VALUES (?, ?)";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+    public void savePerson(Person person) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_ADD_PERSON)) {
             statement.setString(1, person.getName());
             statement.setDate(2, (Date) person.getCreationDate());
             statement.executeUpdate();
@@ -25,9 +41,8 @@ public class PersonDAOImpl implements PersonDAO {
     @Override
     public List<Person> getPeople(){
         List<Person> people = new ArrayList<>();
-        String query = "SELECT * FROM Person";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_GET_PEOPLE)) {
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 int id = resultSet.getInt("id");
@@ -44,9 +59,8 @@ public class PersonDAOImpl implements PersonDAO {
     @Override
     public List<Person> getPersonByID(int personId){
         List<Person> people = new ArrayList<>();
-        String query = "SELECT * FROM Person WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_GET_PERSON_BY_ID)) {
             statement.setInt(1, personId);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
@@ -63,13 +77,8 @@ public class PersonDAOImpl implements PersonDAO {
 
     @Override
     public void deletePerson(int personId){
-        String queryDeleteTickets = "DELETE FROM Ticket WHERE user_id = ?";
-        String queryDeletePerson = "DELETE FROM Person WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement1 = connection.prepareStatement(queryDeleteTickets);
-             PreparedStatement statement2 = connection.prepareStatement(queryDeletePerson)) {
-            statement1.setInt(1, personId);
-            statement1.executeUpdate();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement2 = connection.prepareStatement(QUERY_REMOVE_PERSON)) {
             statement2.setInt(1, personId);
             statement2.executeUpdate();
         } catch (SQLException e) {

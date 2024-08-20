@@ -1,20 +1,38 @@
 package org.chementsova.dao.daoImpl;
 
-import org.chementsova.DbUtils;
 import org.chementsova.dao.TicketDAO;
 import org.chementsova.model.Ticket;
 import org.chementsova.model.TicketType;
+import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class TicketDAOImpl implements TicketDAO {
+
+    private static final String QUERY_ADD_TICKET = "INSERT INTO Ticket (ticket_type, creation_date, user_id) VALUES (?, ?, ?)";
+
+    private static final String QUERY_UPDATE_TICKET = "UPDATE Ticket SET ticket_type = ? WHERE id = ?";
+
+    private static final String QUERY_GET_TICKET_BY_ID = "SELECT * FROM Ticket WHERE id = ?";
+
+    private static final String QUERY_GET_TICKET_BY_USER_ID = "SELECT * FROM Ticket WHERE user_id = ?";
+
+    private static final String QUERY_GET_TICKETS = "SELECT * FROM Ticket";
+    
+    private DataSource dataSource;
+    
+    public TicketDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
-    public void saveTicket(Ticket ticket){
-        String query = "INSERT INTO Ticket (ticket_type, creation_date, user_id) VALUES (?, ?, ?)";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+    public void saveTicket(Ticket ticket) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_ADD_TICKET)) {
             statement.setObject(1, ticket.getTicketType(), java.sql.Types.OTHER);
             statement.setDate(2, (Date) ticket.getCreationDate());
             statement.setInt(3, ticket.getPersonId());
@@ -27,9 +45,8 @@ public class TicketDAOImpl implements TicketDAO {
     @Override
     public List<Ticket> getTickets() {
         List<Ticket> tickets = new ArrayList<>();
-        String query = "SELECT * FROM Ticket";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_GET_TICKETS)) {
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 int id = resultSet.getInt("id");
@@ -45,11 +62,10 @@ public class TicketDAOImpl implements TicketDAO {
     }
 
     @Override
-    public List<Ticket> getTicketByID(int ticketId){
+    public List<Ticket> getTicketByID(int ticketId) {
         List<Ticket> tickets = new ArrayList<>();
-        String query = "SELECT * FROM Ticket WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_GET_TICKET_BY_ID)) {
             statement.setInt(1, ticketId);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
@@ -66,11 +82,10 @@ public class TicketDAOImpl implements TicketDAO {
     }
 
     @Override
-    public List<Ticket> getTicketsByUserID(int personId){
+    public List<Ticket> getTicketsByUserID(int personId) {
         List<Ticket> tickets = new ArrayList<>();
-        String query = "SELECT * FROM Ticket where user_id = ?";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_GET_TICKET_BY_USER_ID)) {
             statement.setInt(1, personId);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
@@ -87,10 +102,9 @@ public class TicketDAOImpl implements TicketDAO {
     }
 
     @Override
-    public void updateTicketType(int id, TicketType newTicketType){
-        String query = "UPDATE Ticket SET ticket_type = ? WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+    public void updateTicketType(int id, TicketType newTicketType) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QUERY_UPDATE_TICKET)) {
             statement.setObject(1, newTicketType, java.sql.Types.OTHER);
             statement.setInt(2, id);
             statement.executeUpdate();
